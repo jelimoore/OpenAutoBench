@@ -38,6 +38,7 @@ def performTests(testList, instrument, ipAddr):
 
             if (currTest.isRadioEligible()):
                 try:
+                    report += '--- {} ---\n'.format(currTest.name)
                     currTest.setup()
                     currTest.performTest()
                     currTest.tearDown()

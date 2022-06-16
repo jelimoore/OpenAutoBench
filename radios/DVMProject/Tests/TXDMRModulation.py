@@ -13,7 +13,7 @@ class testTxDMRModulation(AutoTest):
         if (downlink is not None):
             self._testPoints = [downlink]
         else:
-            self._testPoints = [140, 150, 440, 450, 460, 470, 900, 910, 920, 930]
+            self._testPoints = [140, 150, 440, 450, 460, 467.75, 900, 910, 920, 930]
         self._logger = logging.getLogger(__name__)
         self.report = ''
 
