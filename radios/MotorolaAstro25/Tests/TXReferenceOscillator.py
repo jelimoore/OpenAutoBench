@@ -14,54 +14,47 @@ class testTxReferenceOscillator(AutoTest):
         self._logger = logging.getLogger(__name__)
         self.old_softpot = 0
         self.new_softpot = 0
-        self._softpotNumBytes = 1   # default to 1 byte per softpot
+        self._softpotNumBytes = 2   # default to 2 bytes per softpot
         self.report = ''
         self._autotuner = None
-        self._tolerance = 15
+        self._tolerance = 25
 
     def isRadioEligible(self):
-        if (self._radio.bandsplit == "Q" or
-            self._radio.bandsplit == "T"):
+        if ('H18Q' in self._radio.modelNumber or 
+            'H18K' in self._radio.modelNumber or
+            'H18U' in self._radio.modelNumber):
             return True
-        else:
-            return False
+        return False
 
     def setup(self):
         self._instrument._sendCmd("DISP RFAN")
-        if (self._radio.bandsplit == "Q"):
+        if ('H18Q' in self._radio.modelNumber):
             self._frequency = 469.975
-        if (self._radio.bandsplit == "T"):
-            self._frequency = 511.825
-        if (self._radio.bandsplit == "R"):
-            self._frequency = 477.425
 
-        self.old_softpot = self._radio.getSoftpotValue(0x00, numBytes=self._softpotNumBytes)[0]
-        self.new_softpot = self.old_softpot
+        if ('H18K' in self._radio.modelNumber):
+            self._frequency = 173.925
 
-    def performTest(self):
-        self._logger.info("Beginning reference oscillator test")
-        self._radio.setPowerLevel(3)
+        if ('H18U' in self._radio.modelNumber):
+            self._frequency = 869.8875
+
         self._radio.send(b'\x00\x02\x10')
-        # set frequency 00 0b 05 9a 3f f8 64 01
         self._radio.setTXFrequency(self._frequency)
         self._instrument.setRXFrequency(self._frequency * 1000000)
+        self.old_softpot = self._radio.getSoftpotValue(0x00, self._softpotNumBytes)[0]
+        self.new_softpot = self.old_softpot
+    def performTest(self):
         self._radio.keyRadio()
-        self._radio.updateSoftpotValue(0x00, self.new_softpot, numBytes=self._softpotNumBytes)
-        # sleep for a bit longer to let the radio warm up
+        #self._radio.setPowerLevel(3)
+        self._radio.updateSoftpotValue(0x00, self.new_softpot, self._softpotNumBytes)
         time.sleep(7)
         err = round(self._instrument.measureRFError(self._frequency * 1000000), 2)
         #print("Dekeying")
         self._radio.unkeyRadio()
-        logLine = ''
-        if (self._radio.isGen2):
-            absFreq = float((self._frequency * 1000000) - err)
-            logLine = "Absolute frequency: {}hz".format(absFreq)
-            
-        else:
-            logLine = "Measured Frequency Error: {}hz".format(err)
-        
+        logLine = "Measured Frequency Error at {}MHz: {}hz".format(self._frequency, err)
         self._logger.info(logLine)
-        self.report = logLine + '\n'
+        self.report = logLine
+        self.report += '\n\n'
+
         return err
 
     def performAlignment(self):
@@ -79,7 +72,7 @@ class testTxReferenceOscillator(AutoTest):
             
             if (self._frequency * 1000000 - self._tolerance < measAbs and self._frequency * 1000000 + self._tolerance > measAbs):
                 self._logger.info("Alignment complete. New softpot value: {}".format(self.new_softpot))
-                self._radio.writeSoftpotValue(0x00, self.new_softpot, numBytes=self._softpotNumBytes)
+                self._radio.writeSoftpotValue(0x00, self.new_softpot, self._softpotNumBytes)
                 break
         
         time.sleep(0.2)

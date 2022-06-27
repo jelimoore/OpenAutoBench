@@ -1,4 +1,5 @@
 venv/
 __pycache__
 *.pyc
-trbo_keys.py
+config.yml
+wvdial.conf

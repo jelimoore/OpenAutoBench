@@ -49,6 +49,7 @@ class testTxPortablePower(AutoTest):
                                 514.625,
                                 526.975]
 
+        #TODO: use existing MotorolaCommon functions to get softpots rather than doing so manually
         self._radio.setPowerLevel(0)
         softpot_high = (self._radio.send(b'\x00\x01\x03\x01'))
         # iterate over frequencies and create test points with the softpot value
@@ -57,7 +58,6 @@ class testTxPortablePower(AutoTest):
             softpotPoint = softpot_high[offset:offset+2]
             self._hpTestpoints.append({'freq': freq, 'softpot': softpotPoint})
             offset += 2
-        print(self._hpTestpoints)
 
         # repeat for low power
         self._radio.setPowerLevel(3)
@@ -68,7 +68,6 @@ class testTxPortablePower(AutoTest):
             softpotPoint = softpot_low[offset:offset+2]
             self._lpTestpoints.append({'freq': freq, 'softpot': softpotPoint})
             offset += 2
-        print(self._hpTestpoints)
 
         # set mode analog
         self._radio.send(b'\x00\x02\x10')
@@ -76,6 +75,7 @@ class testTxPortablePower(AutoTest):
     def performTest(self):
         self._logger.info("Testing low power")
         self._radio.setPowerLevel(3)
+        self.report+='Low Power\n'
         for tp in self._lpTestpoints:
             freq = tp['freq']
             sp = tp['softpot']
@@ -87,8 +87,11 @@ class testTxPortablePower(AutoTest):
             time.sleep(4)
             pow = round(self._instrument.measureRFPower(), 2)
             self._logger.info("Power: {}w".format(pow))
+            self.report += 'Measured power at {}MHz: {}w\n'.format(freq, pow)
             self._radio.unkeyRadio()
             time.sleep(1)
+
+        self.report+='High Power\n'
 
         self._logger.info("Testing high power")
         self._radio.setPowerLevel(0)
@@ -103,6 +106,7 @@ class testTxPortablePower(AutoTest):
             time.sleep(4)
             pow = round(self._instrument.measureRFPower(), 2)
             self._logger.info("Power: {}w".format(pow))
+            self.report += 'Measured power at {}MHz: {}w\n'.format(freq, pow)
             self._radio.unkeyRadio()
             time.sleep(1)
             

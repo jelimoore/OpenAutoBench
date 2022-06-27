@@ -7,37 +7,8 @@ import logging
 import time
 from radios.MotorolaCommon import MotorolaIP
 import socket
-from enum import Enum
 
-class MotorolaAPX(MotorolaIP):
-    FREON_MODELS = ['H92', 'H91']
-    class RADIOBAND(Enum):
-        BAND_VHF = 0x00
-        BAND_UHF1 = 0x01
-        BAND_UHF2 = 0x02
-        BAND_7800 = 0x03
-        BAND_900_1 = 0x04
-        BAND_900_2 = 0x05
-
-    RF_TEST_FREQUENCIES = {}
-    RF_TEST_FREQUENCIES['VHF'] = {}
-    RF_TEST_FREQUENCIES['UHF1'] = {}
-    RF_TEST_FREQUENCIES['UHF2'] = {}
-    RF_TEST_FREQUENCIES['7-800'] = {}
-
-    RF_TEST_FREQUENCIES['VHF']['RX'] = []
-    RF_TEST_FREQUENCIES['VHF']['TX'] = []
-
-    RF_TEST_FREQUENCIES['UHF1']['RX'] = []
-    RF_TEST_FREQUENCIES['UHF1']['TX'] = []
-
-    RF_TEST_FREQUENCIES['UHF2']['RX'] = []
-    RF_TEST_FREQUENCIES['UHF2']['TX'] = []
-
-    RF_TEST_FREQUENCIES['7-800']['RX'] = []
-    RF_TEST_FREQUENCIES['7-800']['TX'] = []
-
-
+class MotorolaAstro25(MotorolaIP):
     def __init__(self, ipAddress='192.168.128.1'):
         self.connected = False
         self._ipAddress = ipAddress
@@ -51,7 +22,7 @@ class MotorolaAPX(MotorolaIP):
         self.dspVersion = ''
         self.secureVersion = ''
         self.secureAlgs = ''
-        self.bands = []
+        self.bandsplit = ''
         self.isFreon = False
         self.formFactor = ''
         self.powerLevel = ''
@@ -89,11 +60,6 @@ class MotorolaAPX(MotorolaIP):
             self._logger.debug("Power Level: {}".format(self.powerLevel))
             self._logger.debug("Form Factor: {}".format(self.formFactor))
 
-            if (self.modelNumber[0:3] in MotorolaAPX.FREON_MODELS):
-                self.isFreon = True
-            
-            self._logger.debug("Freon: {}".format(self.isFreon))
-
             connected = True
         except Exception as e:
             self._logger.debug(e)
@@ -128,16 +94,3 @@ class MotorolaAPX(MotorolaIP):
             except Exception as e:
                 self._logger.error("Remote side dropped")
                 self._logger.debug(e)
-
-    def getSoftpotFreqs(self, softpotId):
-        idBytes = softpotId.to_bytes(1, "big")
-        result = self.send(b'\x00\x01\x08' + idBytes)
-        freqString = result[3:]
-        # each frequency is represented by 4 bytes
-        numFreqs = int(len(freqString) / 4)
-        freqList = []
-        for i in range(0,numFreqs):
-            freq = freqString[i*4:i*4+4]
-            freq = (int.from_bytes(freq, "big") * 5) / 1000000
-            freqList.append(freq)
-        return freqList

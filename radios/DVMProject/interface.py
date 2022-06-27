@@ -16,6 +16,7 @@ CMD_CAL_DATA    = b'\x08'
 STATE_IDLE      = b'\x00'
 STATE_DMR       = b'\x01'
 STATE_P25       = b'\x02'
+STATE_RSSI_CAL  = b'\x60'
 STATE_P25_CAL   = b'\x61'
 STATE_DMR_CAL   = b'\x62'
 
@@ -198,6 +199,25 @@ class DVMProjectInterface():
         command = CMD_CAL_DATA + b'\x00'
         self._send(command)
 
+    def readRSSI(self):
+        self._serialPort.reset_input_buffer()
+        t_end = time.time() + 2
+        max = 0
+        min = 0
+        ave = 0
+        while time.time() < t_end:
+            resp = self._receive()
+            if (len(resp) == 0):
+                continue
+            if (resp[1] != 0x09):
+                continue
+            #print(resp)
+            max = resp[2] << 8 | resp[3]
+            min = resp[4] << 8 | resp[5]
+            ave = resp[6] << 8 | resp[7]
+            break
+        return (max, min, ave)
+
     def _send(self, data):
         packet = b''
         #print("Incoming length: {}".format(len(data)))
@@ -210,7 +230,7 @@ class DVMProjectInterface():
         self._serialPort.write(packet)
 
     def _receive(self):
-        t_end = time.time() + 1
+        t_end = time.time() + 2
         reply = b''
         packetLen = 0
         hasStart = False
@@ -242,7 +262,5 @@ class DVMProjectInterface():
                 else:
                     if (b == DVM_FRAME_START):
                         hasStart = True
-                    else:
-                        raise Exception("Expected frame start but did not receive it")
         #print(reply)
         return reply

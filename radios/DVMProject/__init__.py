@@ -1,4 +1,4 @@
-from .Tests import TXReferenceOscillator, TXP25Modulation, TXDMRModulation
+from .Tests import TXReferenceOscillator, TXP25Modulation, TXDMRModulation, RXRSSIPlot
 import logging
 from .interface import DVMProjectInterface
 from .interface import STATE_IDLE
@@ -8,7 +8,8 @@ import time
 
 AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
                     TXP25Modulation.testTxP25Modulation,
-                    TXDMRModulation.testTxDMRModulation,]
+                    TXDMRModulation.testTxDMRModulation,
+                    RXRSSIPlot.testRxRSSIPlot]
 
 logger = logging.getLogger(__name__)
 

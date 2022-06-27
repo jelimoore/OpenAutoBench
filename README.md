@@ -16,16 +16,39 @@ Note: There is a difference between auto*test* and auto*tune* in this program. A
 
 Note: Currently, autotune is not supported, and likely won't be for a while. Currently, it will just test radios.
 
-Note: HPIB is an old standard (parallel bus, yuck). You will likely need an adapter that goes from your test set to your computer. You can either purchase a commercial adapter, or use the open-source (AR488)[https://github.com/Twilight-Logic/AR488] adapter. It can be built with just an Arduino and a Centronics 24-pin connector.
+Note: GPIB is an old standard (parallel bus, yuck). You will likely need an adapter that goes from your test set to your computer. You can either purchase a commercial adapter, or use the open-source (AR488)[https://github.com/Twilight-Logic/AR488] adapter. It can be built with just an Arduino and a Centronics 24-pin connector.
+
+## Radios and Tests
+
+The platform supports many radios including Motorola APX, XPR, Astro25; and DVMProject hotspots and repeater modems.
+
+Tested Platforms:
+- APX
+  - APX900 (U)
+  - APX7000 (V/7/8)
+  - APX8000 (all)
+- MotoTRBO
+  - XPR6350 (T)
+  - XPR4550 (Q)
+  - XPR5550 (Q)
+- Astro25
+  - XTS5000 (Q, K)
+- DVMProject
+  - MMDVM_HS_Dual
+  - STM32F4_POG (Repeater-Builder)
+
+## Test Sets and Instruments
+
+The platform supports many different vendor-agnostic interfaces such as GPIB and SCPI. You have a choice of GPIB or SCPI, over either ethernet or serial. For example, you could have an ethernet to GPIB converter, USB/serial to GPIB converter, raw TCP/SCPI to an instrument, or USB/serial to an instrument that speaks SCPI. Simply set the appropriate options in config.yml.
 
 ## License
 
 This is licensed under the GNU GPLv3 license. Use of this project is intended for amateur and/or educational use ONLY. Any other use is at the risk of user and all commercial purposes are strictly discouraged.
 
+All product names, logos, brands, trademarks and registered trademarks are property of their respective owners.
+
 Copyright (C) Natalie Moore 2022
 
 ## Setup and testing
 
-Good luck. I still need to document this. Just run the OpenAutoBench.py file and play around.
-
-As this is beta, a lot of things are assumed. Namely, if your HPIB interface is on a different serial port, or your radio is a different IP address, you will need to modify the code.
+Good luck. I still need to document this. Set up config.yml, run the OpenAutoBench.py file and play around.

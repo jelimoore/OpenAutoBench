@@ -1,0 +1,33 @@
+radios:
+    apx:
+        enable: true
+        ipAddress: 192.168.128.1 # the IP of your radio
+    trbo:
+        enable: true
+        ipAddress: 192.168.10.1 # the IP of your radio
+        auth:
+            keys:
+              - 0x00000000 # the real keys are not included with this software
+              - 0x00000000 # as they are property of motorola solutions
+              - 0x00000000
+              - 0x00000000
+            delta: 0x00000000
+            index: 0
+    astro25:
+        enable: true
+        port: /dev/ttyUSB0 # the serial port your radio is attached to
+        baud: 9600 # usually 9600
+        wvdialPath: /usr/bin/wvdial # the location of the wvdial executable
+        pppdPath: /usr/sbin/pppd # the location of the pppd executable
+    dvmproject:
+        enable: true
+        port: /dev/ttyUSB0
+
+instrument:
+    protocol: gpib # can be gpib or scpi
+    interface: serial # can be tcp or serial
+    ipAddr: 0.0.0.0 # TCP address to connect to
+    ipPort: 5025 # tcp port, usually 5024 or 5025
+    serialPort: /dev/ttyACM0 # serial port
+    baud: 115200 # baudrate of serial instrument/interface
+    gpibAddress: 14 # GPIB address of the instrument

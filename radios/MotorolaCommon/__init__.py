@@ -1,4 +1,14 @@
 class MotorolaIP():
+    P25_ALG_LIST = {0x81: 'DES-OFB',
+                    0x83: '3DES',
+                    0x84: 'AES-256',
+                    0x85: 'AES-128',
+                    0x9F: 'DES-XL',
+                    0xA0: 'DVI-XL',
+                    0xA1: 'DVP-XL',
+                    0xA2: 'DVI-SPFL',
+                    0xAA: 'ADP'}
+
     def __init__(self, ipAddress='0.0.0.0'):
         self.connected = False
         self._ipAddress = ipAddress
@@ -76,3 +86,66 @@ class MotorolaIP():
         resp = self.send(b'\x00\x0e\x02')
         # parse incoming bytes to float
         return round(float("{}.{}".format(resp[2] * -1, resp[3])), 2)
+
+    def updateSoftpotValue(self, softpotId, value, numBytes=2):
+        idBytes = softpotId.to_bytes(1, "big")
+        softpotBytes = value.to_bytes(numBytes, "big")
+        command = b'\x00\x01\x02' + idBytes + softpotBytes
+        self.send(command)
+
+    def writeSoftpotValue(self, softpotId, value, numBytes=2):
+        idBytes = softpotId.to_bytes(1, "big")
+        softpotBytes = value.to_bytes(numBytes, "big")
+        command = b'\x00\x01\x01' + idBytes + softpotBytes
+        self.send(command)
+
+    def getSoftpotValue(self, softpotId, numBytes=2):
+        idBytes = softpotId.to_bytes(1, "big")
+        result = self.send(b'\x00\x01\x00' + idBytes)
+
+        result = result[3:]
+        # each value is represented by number of bytes
+        numVals = int(len(result) / numBytes)
+        valList = []
+        for i in range(0,numVals):
+            val = result[i*numBytes:i*numBytes+numBytes]
+            val = int.from_bytes(val, "big")
+            valList.append(val)
+        return valList
+
+    def getSecureVersion(self):
+        result = self.send(b'\x00\x0f\x22')
+        result = result[3:]
+        return result.decode()
+    
+    def getSecureAlgorithms(self):
+        result = self.send(b'\x00\x13')
+        result = result[3:]
+        algString = ''
+        for alg in result:
+            if (alg in self.P25_ALG_LIST):
+                algString += self.P25_ALG_LIST[alg]
+                algString += ' '
+            else:
+                algString += "ALGORITHM {:2X} ".format(alg)
+        return algString
+
+    def getModelNumber(self):
+        result = self.send(b'\x00\x10\x00')
+        return result.replace(b'\x00', b'').decode()
+
+    def getSerialNumber(self):
+        result = self.send(b'\x00\x11\x00')
+        return result.replace(b'\x00', b'').decode()
+
+    def getFirmwareVersion(self):
+        result = self.send(b'\x00\x0f\x00')
+        return result.replace(b'\x00', b'').decode()
+
+    def getDspVersion(self):
+        result = self.send(b'\x00\x0f\x10')
+        return result.replace(b'\x00', b'').decode()
+
+    def getTuningVersion(self):
+        result = self.send(b'\x00\x0f\x40')
+        return result.replace(b'\x00', b'').decode()

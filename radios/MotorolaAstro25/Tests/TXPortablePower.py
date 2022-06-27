@@ -5,7 +5,7 @@ from openautobench.common import AutoTest
 import time
 
 class testTxPortablePower(AutoTest):
-    name = "Tx - High/Low Power Test (Portable)"
+    name = "Tx - High/Medium/Low Power Test (Portable)"
     def __init__(self, radio, instrument):
         self._radio = radio
         self._instrument = instrument
@@ -16,16 +16,39 @@ class testTxPortablePower(AutoTest):
         self.report = ''
 
     def isRadioEligible(self):
-        if (self._radio.isFreon and self._radio.formFactor == 'H' and 'H91' not in self._radio.modelNumber):
+        if ('H18Q' in self._radio.modelNumber or 'H18K' in self._radio.modelNumber):
             return True
         return False
 
     def setup(self):
         self._instrument.setDisplay("RFAN")
-        self._frequencies = self._radio.getSoftpotFreqs(0x01)
+        if ('H18Q' in self._radio.modelNumber):
+            self._frequencies = [
+                380.025,
+                390.025,
+                400.025,
+                411.025,
+                424.925,
+                425.025,
+                435.025,
+                445.025,
+                457.025,
+                469.925
+            ]
+
+        if ('H18K' in self._radio.modelNumber):
+            self._frequencies = [
+                136.075,
+                142.075,
+                154.275,
+                160.175,
+                168.125,
+                173.925
+            ]
+        
+        #TODO: make this use the common softpot read function
         self._radio.setPowerLevel(0)
         softpotVals = (self._radio.send(b'\x00\x01\x03\x11'))
-        #print(softpotVals)
         # iterate over frequencies and create test points with the softpot value
         offset = 3
         for freq in self._frequencies:
@@ -36,8 +59,6 @@ class testTxPortablePower(AutoTest):
             highPoint = softpotVals[offset:offset+2]
             self._hpTestpoints.append({'freq': freq, 'softpot': highPoint})
             offset += 2
-        #print(self._hpTestpoints)
-        #print(self._lpTestpoints)
         # set mode analog
         self._radio.send(b'\x00\x02\x10')
 

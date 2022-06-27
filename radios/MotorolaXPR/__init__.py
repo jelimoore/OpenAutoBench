@@ -41,6 +41,7 @@ def performTests(testList, instrument, keys, delta, index, ipAddr):
                     report += '--- {} ---\n'.format(currTest.name)
                     currTest.setup()
                     currTest.performTest()
+                    #currTest.performAlignment()
                     report += currTest.report
                     currTest.tearDown()
                     report += '\n'

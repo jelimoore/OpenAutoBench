@@ -1,12 +1,21 @@
-from instruments.HPIB.interface import HPIBInterface
 import time
 import logging
+import yaml
+from yaml.loader import SafeLoader
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(module)-8s:%(levelname)-8s %(message)s', level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 TRBO_ENABLED = False
 
 VERSION = "0.0.1"
+CONFIG = None
+
+
+try:
+    with open('config.yml', 'r') as f:
+        CONFIG = list(yaml.load_all(f, Loader=SafeLoader))[0]
+except:
+    raise Exception("Error opening config file. Does config.yml exist?")
 
 def genMenu(header, options):
     selections = []
@@ -29,20 +38,44 @@ def genMenu(header, options):
         else:
             return result
 
-try:
-    import trbo_keys
-    TRBO_ENABLED = True
-except ImportError:
-    import trbo_keys_sample
-    logger.warning("Could not find MotoTRBO keys to import. Make sure you renamed the file to trbo_keys.py and the syntax is correct. MotoTRBO tuning will be unavailable.")
-
-logger.info("OpenAutoBench version {} starting up".format(VERSION))
-
 def setupInstrument():
     try:
-        instrument = HPIBInterface('/dev/ttyACM0', 14)
+        instrument = None
+        instConfig = CONFIG['instrument']
+
+        instProtocol = instConfig['protocol']
+        instInterface = instConfig['interface']
+        ipAddress = instConfig['ipAddr']
+        ipPort = instConfig['ipPort']
+        serialPort = instConfig['serialPort']
+        baud = int(instConfig['baud'])
+        gpibAddr = int(instConfig['gpibAddress'])
+
+        if (instProtocol == 'gpib' and instInterface == 'serial'):
+            from instruments.GPIB.interface import GPIBSerialInterface
+            instrument = GPIBSerialInterface(serialPort, gpibAddr, baud=baud)
+
+        if (instProtocol == 'gpib' and instInterface == 'tcp'):
+            from instruments.GPIB.interface import GPIBTCPInterface
+            instrument = GPIBTCPInterface(ipAddress, ipPort, gpibAddress)
+
+        if (instProtocol == 'scpi' and instInterface == 'serial'):
+            from instruments.SCPI.interface import SCPISerialInterface
+            instrument = SCPISerialInterface(serialPort, baud)
+
+        if (instProtocol == 'scpi' and instInterface == 'tcp'):
+            from instruments.SCPI.interface import SCPITCPInterface
+            instrument = SCPITCPInterface(ipAddress, ipPort)
+
+        if (instrument is None):
+            raise Exception("Unsupported instrument protocol/interface combination: {}, {}".format(instProtocol, instInterface))
         instrument.connect()
-        time.sleep(0.5)
+        time.sleep(0.2)
+        info = instrument.getInfo()
+        if (info is None or info == ''):
+            raise Exception("Instrument did not respond")
+        logger.info("Connected to test set - {}".format(info))
+        #time.sleep(0.5)
         return instrument
     except Exception as e:
         logger.critical("Failure connecting to instrument. Exiting.")
@@ -50,7 +83,8 @@ def setupInstrument():
         exit(1)
 
 def testXPR():
-    instrument = setupInstrument()
+    xprConfig = CONFIG['radios']['trbo']
+    ipAddr = xprConfig['ipAddress']
     try:
         import radios.MotorolaXPR as XPR
         from radios.MotorolaXPR.Tests import TXDeviation
@@ -58,17 +92,21 @@ def testXPR():
         logger.critical("Error importing MotoTRBO libraries")
         logger.debug(e)
 
-    ipAddr = '192.168.10.1'
+    authConfig = xprConfig['auth']
+    keys = authConfig['keys']
+    delta = authConfig['delta']
+    index = authConfig['index']
 
     logger.info("Available tests: {}".format(XPR.AVAILABLE_TESTS))
     #selectedTests = [TXDeviation.testTxModBalance]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = XPR.AVAILABLE_TESTS
-    XPR.performTests(selectedTests, instrument, trbo_keys.KEYS, trbo_keys.DELTA, trbo_keys.INDEX, ipAddr)
+    instrument = setupInstrument()
+    XPR.performTests(selectedTests, instrument, keys, delta, index, ipAddr)
     
 
 def testAPX():
-    ipAddr = '192.168.128.1'
-    instrument = setupInstrument()
+    apxConfig = CONFIG['radios']['apx']
+    ipAddr = apxConfig['ipAddress']
     try:
         import radios.MotorolaAPX as APX
         from radios.MotorolaAPX.Tests import TXPortablePower
@@ -79,11 +117,24 @@ def testAPX():
     logger.info("Available tests: {}".format(APX.AVAILABLE_TESTS))
     #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = APX.AVAILABLE_TESTS
+    instrument = setupInstrument()
     APX.performTests(selectedTests, instrument, ipAddr)
 
-def testDVMProject():
-    serialPort = '/dev/ttyUSB0'
+def testAstro25():
+    astro25Config = CONFIG['radios']['astro25']
+    try:
+        import radios.MotorolaAstro25 as A25
+    except ImportError as e:
+        logger.critical("Error importing Astro25 libraries")
+        logger.debug(e)
+
+    logger.info("Available tests: {}".format(A25.AVAILABLE_TESTS))
+    #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
+    selectedTests = A25.AVAILABLE_TESTS
     instrument = setupInstrument()
+    A25.performTests(selectedTests, instrument, astro25Config)
+
+def testDVMProject():
     try:
         import radios.DVMProject as DVM
         #from radios.MotorolaAPX.Tests import TXPortablePower
@@ -94,23 +145,24 @@ def testDVMProject():
     logger.info("Available tests: {}".format([DVM.AVAILABLE_TESTS]))
     #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = DVM.AVAILABLE_TESTS
+    instrument = setupInstrument()
     DVM.performTests(selectedTests, instrument, serialPort)
 
 def testRadio():
-    menu = {1: "Motorola XPR", 2: "Motorola APX", 4: "DVMProject", 9: "Exit"}
+    menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 9: "Exit"}
     selection = genMenu('Testing', menu)
     if (selection == 1):
-        if (TRBO_ENABLED):
-            testXPR()
-        else:
-            print("TRBO tuning not enabled. Check your keys.")
+        testXPR()
     elif (selection == 2):
         testAPX()
+    elif (selection == 3):
+        testAstro25()
     elif (selection == 4):
         testDVMProject()
     elif (selection == 9):
         return
 
+logger.info("OpenAutoBench version {} starting up".format(VERSION))
 # main program
 while True:
     menu = {}
