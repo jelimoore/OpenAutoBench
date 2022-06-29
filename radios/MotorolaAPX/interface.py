@@ -53,6 +53,7 @@ class MotorolaAPX(MotorolaIP):
         self.secureAlgs = ''
         self.bands = []
         self.isFreon = False
+        self.isRepeater = False
         self.formFactor = ''
         self.powerLevel = ''
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

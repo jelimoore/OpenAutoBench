@@ -1,4 +1,4 @@
-from .Tests import TXReferenceOscillator, TXPortablePower, TXDeviation
+from .Tests import TXReferenceOscillator, TXPortablePower, TXDeviation, RXFrontEndGain
 import logging
 from .interface import MotorolaAPX
 import time
@@ -6,7 +6,8 @@ from datetime import datetime
 
 AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
                     TXPortablePower.testTxPortablePower,
-                    TXDeviation.testTxModBalance]
+                    TXDeviation.testTxModBalance,
+                    RXFrontEndGain.testRxFrontEndGain]
 
 logger = logging.getLogger(__name__)
 

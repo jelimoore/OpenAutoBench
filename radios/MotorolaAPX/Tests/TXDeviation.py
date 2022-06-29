@@ -18,14 +18,13 @@ class testTxModBalance():
             return True
         else:
             return False
+
     def setup(self):
         self._instrument.setDisplay("AFAN")
         self._instrument._sendCmd("AFAN:FILT1 '<20Hz HPF'")
         self._instrument._sendCmd("AFAN:FILT2 '15kHz LPF'")
         self._frequencies = self._radio.getSoftpotFreqs(0x02)
 
-        
-        
     def performTest(self):
         self._logger.info("Beginning Mod Balance test")
         self._radio.setPowerLevel(3)

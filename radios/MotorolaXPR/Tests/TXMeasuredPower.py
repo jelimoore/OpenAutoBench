@@ -16,7 +16,7 @@ class testTxMeasuredPower(AutoTest):
 
     def isRadioEligible(self):
         if (self._radio.formFactor == 'M'):
-            if (self._radio.bandsplit == "Q" and self._radio.powerLevel == "P"):
+            if (self._radio.bandsplit == "Q"or self._radio.bandsplit == 'T'):
                 return True
             else:
                 return False
@@ -34,16 +34,27 @@ class testTxMeasuredPower(AutoTest):
                                 447.775,
                                 458.950,
                                 469.975]
+
+        if (self._radio.bandsplit == "T"):
+            self._frequencies = [
+                450.000,
+                462.400,
+                474.800,
+                487.200,
+                499.600,
+                512.000,
+                512.000050,
+                519.500,
+                527.000
+            ]
         
-        softpots = self._radio.send(b'\x00\x01\x03\x11')
-        # iterate over frequencies and create test points with the softpot value
-        offset = 3
+        softpots = self._radio.readallSoftpotValue(0x11)
+        offset = 0
         for freq in self._frequencies:
-            sp = []
-            for i in range(0,4):
-                sp.append(softpots[offset:offset+2])
-                offset += 2
+            sp = softpots[offset:offset+4]
             self._testpoints.append({'freq': freq, 'softpots': sp})
+            offset += 4
+
 
     def performTest(self):
         self._logger.info("Beginning Measured Power test")
@@ -62,7 +73,7 @@ class testTxMeasuredPower(AutoTest):
             for sp in sps:
                 self._logger.debug("Testing softpot value {}".format(sp))
                 self._radio.keyRadio()
-                self._radio.send(b'\x00\x01\x02\x01' + sp)
+                self._radio.updateSoftpotValue(0x01, sp)
                 time.sleep(4)
                 power = round(self._instrument.measureRFPower(), 2)
                 self._logger.debug("Measured power {}w".format(power))

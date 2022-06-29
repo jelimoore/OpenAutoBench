@@ -15,7 +15,7 @@ class testTxModBalance():
 
     def isRadioEligible(self):
         if (self._radio.formFactor == 'M'):
-            if (self._radio.bandsplit == "Q" and self._radio.powerLevel == "P"):
+            if (self._radio.bandsplit == "Q" or self._radio.bandsplit == 'T'):
                 return True
             else:
                 return False
@@ -69,6 +69,19 @@ class testTxModBalance():
                                 496.000,
                                 527.000,
                                 460.000005]
+
+        # Mobs and reps
+        if (self._radio.bandsplit == 'T' and self._radio.formFactor == 'M'):
+            self._frequencies = [
+                450.000,
+                463.000,
+                476.000,
+                488.500,
+                488.500050,
+                501.000,
+                514.000,
+                527.000
+            ]
         
     def performTest(self):
         self._logger.info("Beginning Mod Balance test")
@@ -96,6 +109,6 @@ class testTxModBalance():
             self._radio.unkeyRadio()
             time.sleep(1)
 
-            self.report += 'Deviation at {}MHz: {}hz low tone, {}hz high tone\n'.format(freq, lowdev, highdev)
+            self.report += 'Deviation at {}MHz:\t{}hz low tone, {}hz high tone\n'.format(freq, lowdev, highdev)
     def tearDown(self):
         pass

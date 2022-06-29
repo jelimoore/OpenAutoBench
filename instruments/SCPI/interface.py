@@ -13,7 +13,6 @@ class SCPIBaseInterface(InstrumentBase):
         '''Method for connecting to the test instrument and setting any necessary options'''
         raise NotImplementedError("Method must be implemented in child class.")
         
-
     def disconnect(self):
         '''Method for disconnecting from the test instrument and cleaning up'''
         raise NotImplementedError("Method must be implemented in child class.")
@@ -38,6 +37,10 @@ class SCPIBaseInterface(InstrumentBase):
         '''Method for retrieving info about the test set'''
         self._sendCmd('*IDN?')
         return self._readResponse()
+    
+    def reset(self):
+        '''Method for resetting test set'''
+        self._sendCmd('*RST')
 
     def setDisplay(self, screenName):
         self._sendCmd("DISP {}".format(screenName))
@@ -46,6 +49,17 @@ class SCPIBaseInterface(InstrumentBase):
         '''Method for generating an RF signal at the specified frequency and amplitude'''
         self._sendCmd("RFG:FREQ " + str(frequency))
         self._sendCmd("RFG:AMPL " + str(amplitude) +" dBm")
+
+    def enableRFGenerator(self):
+        self._sendCmd('RFG:AMPL:STAT ON')
+
+    def disableRFGenerator(self):
+        self._sendCmd('RFG:AMPL:STAT OFF')
+
+    def setRFOutputPort(self, port):
+        # add quotes to terminate the string
+        port = '"' + port + '"'
+        self._sendCmd("RFG:OUTP " + str(port))
 
     def measureFMDeviation(self):
         '''Method for measuring broadband power at the specified frequency'''
@@ -141,6 +155,39 @@ class SCPITCPInterface(SCPIBaseInterface):
     def _readResponse(self):
         #set a timeout so we don't loop forever, 2 sec is probably fine
         line = self._socket.recv(1024)
+        # strip the newline
+        line.replace(b'\n', b'')
+        return line.decode()
+
+import os
+ 
+class SCPIUSBInterface(SCPIBaseInterface):
+    """Simple implementation of a USBTMC device driver, in the style of visa.h"""
+ 
+    def __init__(self, device):
+        self.device = device
+        self.FILE = os.open(device, os.O_RDWR)
+ 
+
+    def __init__(self, port):
+        super()
+        self.connected = False
+        self._port = None
+        
+    def connect(self):
+        '''Method for connecting to the test instrument and setting any necessary options'''
+        self._port = os.open(device, os.O_RDWR)
+
+    def disconnect(self):
+        '''Method for disconnecting from the test instrument and cleaning up'''
+        pass
+
+    def _sendCmd(self, cmd):
+        os.write(self.FILE, cmd.encode())
+        self._socket.send(b'\r\n')
+
+    def _readResponse(self):
+        return os.read(self.FILE, 1024)
         # strip the newline
         line.replace(b'\n', b'')
         return line.decode()

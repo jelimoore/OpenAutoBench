@@ -1,14 +1,16 @@
-from .Tests import RXFrontEndGain, TXDeviation, TXMeasuredPower, TXPortablePower, TXReferenceOscillator
+from .Tests import RXFrontEndGain, RXReferenceOscillator, RXFrontEndFilter, TXDeviation, TXMeasuredPower, TXPortablePower, TXReferenceOscillator
 import logging
 from .interface import MotorolaXPR
 from datetime import datetime
 import time
 
 AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
+                    TXDeviation.testTxModBalance,
                     TXMeasuredPower.testTxMeasuredPower,
                     TXPortablePower.testTxPortablePower,
-                    RXFrontEndGain.testRxFrontEndGain,
-                    TXDeviation.testTxModBalance]
+                    RXFrontEndFilter.testRxFrontEndFilter,
+                    RXReferenceOscillator.testRxReferenceOscillator,
+                    RXFrontEndGain.testRxFrontEndGain]
 
 logger = logging.getLogger(__name__)
 

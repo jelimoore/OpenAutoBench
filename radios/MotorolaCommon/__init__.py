@@ -21,6 +21,7 @@ class MotorolaIP():
         self.bandsplit = ''
         self.formFactor = ''
         self.powerLevel = ''
+        self.isRepeater = False
         self._logger = logging.getLogger(__name__)
 
     def connect(self):
@@ -113,6 +114,20 @@ class MotorolaIP():
             valList.append(val)
         return valList
 
+    def readallSoftpotValue(self, softpotId, numBytes=2):
+        idBytes = softpotId.to_bytes(1, "big")
+        result = self.send(b'\x00\x01\x03' + idBytes)
+
+        result = result[3:]
+        # each value is represented by number of bytes
+        numVals = int(len(result) / numBytes)
+        valList = []
+        for i in range(0,numVals):
+            val = result[i*numBytes:i*numBytes+numBytes]
+            val = int.from_bytes(val, "big")
+            valList.append(val)
+        return valList
+
     def getSecureVersion(self):
         result = self.send(b'\x00\x0f\x22')
         result = result[3:]
@@ -149,3 +164,8 @@ class MotorolaIP():
     def getTuningVersion(self):
         result = self.send(b'\x00\x0f\x40')
         return result.replace(b'\x00', b'').decode()
+
+    def getStatus(self, statusId):
+        statusByte = statusId.to_bytes(1, "big")
+        result = self.send(b'\x00\x0e' + statusByte)
+        return result

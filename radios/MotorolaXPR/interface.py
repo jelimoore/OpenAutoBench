@@ -21,6 +21,7 @@ class MotorolaXPR(MotorolaIP):
         self.bootloaderVersion = ''
         self.bandsplit = ''
         self.isGen2 = False
+        self.isRepeater = False
         self.formFactor = ''
         self.powerLevel = ''
         self._xnl = XnlListener(keys, delta, kid, self._ipAddress)
@@ -54,6 +55,9 @@ class MotorolaXPR(MotorolaIP):
 
             if (self.modelNumber[0:3] in MotorolaXPR.GEN2_MODELS):
                 self.isGen2 = True
+
+            if ('R9JA7AN' in self.modelNumber):
+                self.isRepeater = True
             
             self._logger.debug("Generation 2: {}".format(self.isGen2))
 
