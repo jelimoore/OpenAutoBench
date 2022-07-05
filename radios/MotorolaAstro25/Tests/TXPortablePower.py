@@ -16,7 +16,10 @@ class testTxPortablePower(AutoTest):
         self.report = ''
 
     def isRadioEligible(self):
-        if ('H18Q' in self._radio.modelNumber or 'H18K' in self._radio.modelNumber):
+        if ('H18Q' in self._radio.modelNumber or 
+            'H18K' in self._radio.modelNumber or
+            'M20K' in self._radio.modelNumber or
+            'L20K' in self._radio.modelNumber):
             return True
         return False
 
@@ -44,6 +47,20 @@ class testTxPortablePower(AutoTest):
                 160.175,
                 168.125,
                 173.925
+            ]
+        
+        if ('L20K' in self._radio.modelNumber or
+            'M20K' in self._radio.modelNumber):
+            self._frequencies = [
+                136.0125,
+                140.7625,
+                145.5125,
+                150.2625,
+                154.9875,
+                155.0125,
+                159.7625,
+                164.5125,
+                169.2625
             ]
         
         #TODO: make this use the common softpot read function

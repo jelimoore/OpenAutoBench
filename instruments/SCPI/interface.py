@@ -168,7 +168,6 @@ class SCPIUSBInterface(SCPIBaseInterface):
         self.device = device
         self.FILE = os.open(device, os.O_RDWR)
  
-
     def __init__(self, port):
         super()
         self.connected = False

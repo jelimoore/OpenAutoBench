@@ -46,6 +46,20 @@ class testTxModBalance():
                 168.125,
                 173.925
             ]
+        
+        if ('L20K' in self._radio.modelNumber or
+            'M20K' in self._radio.modelNumber):
+            self._frequencies = [
+                136.0125,
+                140.7625,
+                145.5125,
+                150.2625,
+                154.9875,
+                155.0125,
+                159.7625,
+                164.5125,
+                169.2625
+            ]
 
     def performTest(self):
         self._logger.info("Beginning Mod Balance test")

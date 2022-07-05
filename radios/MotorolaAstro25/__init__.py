@@ -109,5 +109,4 @@ def performTests(testList, instrument, config):
         radio.resetRadio()
         radio.disconnect()
         dialProcess.terminate()
-        print(dialProcess)
         instrument.disconnect()
