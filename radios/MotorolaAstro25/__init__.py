@@ -1,4 +1,4 @@
-from .Tests import TXReferenceOscillator, TXPortablePower, TXDeviation
+from .Tests import TXReferenceOscillator, TXPortablePower, TXDeviation, RXFrontEndFilter
 import logging
 from .interface import MotorolaAstro25
 import time
@@ -9,7 +9,8 @@ import signal
 
 AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
                     TXPortablePower.testTxPortablePower,
-                    TXDeviation.testTxModBalance]
+                    TXDeviation.testTxModBalance,
+                    RXFrontEndFilter.testRxFrontEndFilter]
 
 logger = logging.getLogger(__name__)
 

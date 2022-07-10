@@ -24,7 +24,11 @@ class testTxReferenceOscillator(AutoTest):
             'H18K' in self._radio.modelNumber or
             'H18U' in self._radio.modelNumber or
             'M20K' in self._radio.modelNumber or
-            'L20K' in self._radio.modelNumber):
+            'M21K' in self._radio.modelNumber or
+            'L20K' in self._radio.modelNumber or
+            'M20U' in self._radio.modelNumber or
+            'M21U' in self._radio.modelNumber or
+            'L20U' in self._radio.modelNumber or):
             return True
         return False
 
@@ -40,8 +44,14 @@ class testTxReferenceOscillator(AutoTest):
             self._frequency = 869.8875
         
         if ('M20K' in self._radio.modelNumber or
-            'L20K' in self._radio.modelNumber):
+            'L20K' in self._radio.modelNumber or
+            'M21K' in self._radio.modelNumber):
             self._frequency = 169.3125
+
+        if ('M20U' in self._radio.modelNumber or
+            'L20U' in self._radio.modelNumber or
+            'M21U' in self._radio.modelNumber):
+            self._frequency = 869.8875
 
         self._radio.send(b'\x00\x02\x10')
         self._radio.setTXFrequency(self._frequency)

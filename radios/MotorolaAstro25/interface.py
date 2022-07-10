@@ -23,7 +23,7 @@ class MotorolaAstro25(MotorolaIP):
         self.secureVersion = ''
         self.secureAlgs = ''
         self.bandsplit = ''
-        self.isFreon = False
+        self.isRepeater = False
         self.formFactor = ''
         self.powerLevel = ''
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

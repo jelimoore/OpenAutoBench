@@ -85,6 +85,7 @@ class MotorolaIP():
     
     def readRSSI(self):
         resp = self.send(b'\x00\x0e\x02')
+        print(resp)
         # parse incoming bytes to float
         return round(float("{}.{}".format(resp[2] * -1, resp[3])), 2)
 
