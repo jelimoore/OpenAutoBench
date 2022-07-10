@@ -28,7 +28,7 @@ class testTxReferenceOscillator(AutoTest):
             'L20K' in self._radio.modelNumber or
             'M20U' in self._radio.modelNumber or
             'M21U' in self._radio.modelNumber or
-            'L20U' in self._radio.modelNumber or):
+            'L20U' in self._radio.modelNumber):
             return True
         return False
 
