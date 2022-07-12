@@ -18,7 +18,8 @@ class testRxFrontEndFilter(protoRxFrontEndFilter):
     def setup(self):
         super().setup()
         if ('M20K' in self._radio.modelNumber or
-            'L20K' in self._radio.modelNumber):
+            'L20K' in self._radio.modelNumber or
+            'M21K' in self._radio.modelNumber):
             self._frequencies = [
                 146.0625,
                 140.8125,
@@ -31,8 +32,9 @@ class testRxFrontEndFilter(protoRxFrontEndFilter):
                 169.3125
             ]
 
-        if ('M20K' in self._radio.modelNumber or
-            'L20K' in self._radio.modelNumber):
+        if ('M20U' in self._radio.modelNumber or
+            'L20U' in self._radio.modelNumber or
+            'M21U' in self._radio.modelNumber):
             self._frequencies = [
                 762.0625,
                 769.0625,

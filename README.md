@@ -33,6 +33,9 @@ Tested Platforms:
   - XPR5550 (Q)
 - Astro25
   - XTS5000 (Q, K)
+  - XTL1500/2500/5000/Astro Digital Consolette family (U, K)
+- Quantar
+  - Quantar (800MHz)
 - DVMProject
   - MMDVM_HS_Dual
   - STM32F4_POG (Repeater-Builder)

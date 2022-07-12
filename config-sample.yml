@@ -19,6 +19,10 @@ radios:
         baud: 9600 # usually 9600
         wvdialPath: /usr/bin/wvdial # the location of the wvdial executable
         pppdPath: /usr/sbin/pppd # the location of the pppd executable
+    quantar:
+        enable: true
+        port: /dev/ttyUSB0
+        baud: 9600
     dvmproject:
         enable: true
         port: /dev/ttyUSB0

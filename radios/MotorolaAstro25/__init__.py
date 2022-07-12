@@ -44,9 +44,23 @@ def dialRadio(config):
     print("Howdy. We're about to start up a PPP dialer. We may need your sudo password for root access.")
     print("If you don't want to deal with this in the future, try adding wvdial to your sudo file.")
     dialProcess = subprocess.Popen(['sudo', wvdialPath, '-C', wvdialConfigName], preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    time.sleep(6)
-    #TODO: detect when PPP connects and if it's successful
-    return dialProcess
+    
+    # give it 5sec to connect to radio
+    t_end = time.time() + 5
+    while time.time() < t_end:
+        currOut = dialProcess.stdout.readline()
+        currErr = dialProcess.stderr.readline()
+        if (len(currOut) > 0):
+            print(currOut)
+
+        if (len(currErr) > 0):
+            print(currErr)
+
+        if (b'Starting pppd' in currLine):
+            # link is up
+            return dialProcess
+    # if it timed out, then return None to indicate the connection failed
+    return None
 
 def undialRadio(process):
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)

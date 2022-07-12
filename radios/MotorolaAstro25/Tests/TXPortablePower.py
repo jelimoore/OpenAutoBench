@@ -113,7 +113,7 @@ class testTxPortablePower(AutoTest):
             self._instrument.setRXFrequency(freq * 1000000)
             self._radio.keyRadio()
             self._radio.send(b'\x00\x01\x02\x01' + sp)
-            time.sleep(4)
+            time.sleep(5)
             pow = round(self._instrument.measureRFPower(), 2)
             self._logger.info("Power: {}w".format(pow))
             self.report += 'Measured power at {}MHz: {}w\n'.format(freq, pow)

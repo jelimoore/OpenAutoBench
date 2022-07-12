@@ -126,7 +126,6 @@ class SCPISerialInterface(SCPIBaseInterface):
             raise Exception("Serial port must be opened before attempting to send commands")
 
     def _readResponse(self):
-        #set a timeout so we don't loop forever, 2 sec is probably fine
         line = self._serialPort.readline()
         # strip the newline
         line.replace(b'\n', b'')
@@ -153,7 +152,6 @@ class SCPITCPInterface(SCPIBaseInterface):
         self._socket.send(b'\r\n')
 
     def _readResponse(self):
-        #set a timeout so we don't loop forever, 2 sec is probably fine
         line = self._socket.recv(1024)
         # strip the newline
         line.replace(b'\n', b'')

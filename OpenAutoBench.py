@@ -135,21 +135,34 @@ def testAstro25():
     A25.performTests(selectedTests, instrument, astro25Config)
 
 def testDVMProject():
+    DVMConfig = CONFIG['radios']['dvmproject']
+    serialPort = DVMConfig['port']
     try:
         import radios.DVMProject as DVM
-        #from radios.MotorolaAPX.Tests import TXPortablePower
     except ImportError as e:
         logger.critical("Error importing libraries")
         logger.debug(e)
 
     logger.info("Available tests: {}".format([DVM.AVAILABLE_TESTS]))
-    #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = DVM.AVAILABLE_TESTS
     instrument = setupInstrument()
     DVM.performTests(selectedTests, instrument, serialPort)
 
+def testQuantar():
+    QuantarConfig = CONFIG['radios']['quantar']
+    try:
+        import radios.MotorolaQuantar as Quantar
+    except ImportError as e:
+        logger.critical("Error importing libraries")
+        logger.debug(e)
+
+    logger.info("Available tests: {}".format([Quantar.AVAILABLE_TESTS]))
+    selectedTests = Quantar.AVAILABLE_TESTS
+    instrument = setupInstrument()
+    Quantar.performTests(selectedTests, instrument, QuantarConfig)
+
 def testRadio():
-    menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 9: "Exit"}
+    menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 5: "Motorola Quantar", 9: "Exit"}
     selection = genMenu('Testing', menu)
     if (selection == 1):
         testXPR()
@@ -159,6 +172,8 @@ def testRadio():
         testAstro25()
     elif (selection == 4):
         testDVMProject()
+    elif (selection == 5):
+        testQuantar()
     elif (selection == 9):
         return
 
