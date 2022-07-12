@@ -161,8 +161,21 @@ def testQuantar():
     instrument = setupInstrument()
     Quantar.performTests(selectedTests, instrument, QuantarConfig)
 
+def testMTR2k():
+    MTR2kConfig = CONFIG['radios']['mtr2k']
+    try:
+        import radios.MotorolaMTR2k as MTR2k
+    except ImportError as e:
+        logger.critical("Error importing libraries")
+        logger.debug(e)
+
+    logger.info("Available tests: {}".format([MTR2k.AVAILABLE_TESTS]))
+    selectedTests = MTR2k.AVAILABLE_TESTS
+    instrument = setupInstrument()
+    MTR2k.performTests(selectedTests, instrument, MTR2kConfig)
+
 def testRadio():
-    menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 5: "Motorola Quantar", 9: "Exit"}
+    menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 5: "Motorola Quantar", 6: 'MTR2000', 9: "Exit"}
     selection = genMenu('Testing', menu)
     if (selection == 1):
         testXPR()
@@ -174,6 +187,8 @@ def testRadio():
         testDVMProject()
     elif (selection == 5):
         testQuantar()
+    elif (selection == 6):
+        testMTR2k()
     elif (selection == 9):
         return
 

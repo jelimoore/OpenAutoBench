@@ -8,9 +8,7 @@ import os
 import signal
 
 AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
-                    TXDeviation.testTxModBalance,
-                    TXPower.testTxPower,
-                    RXRSSI.testRxRSSI]
+                    TXDeviation.testTxModBalance]
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +32,8 @@ def performTests(testList, instrument, config):
     report = "-------- Test Report for {} --------\n\n".format(radio.stationName)
     report+= "Tested on {}\n".format(datetime.now())
     report+= "Serial: {}\tCodeplug: {}\n".format(radio.serialNumber, radio.codeplugVersion)
-    report+= "Firmware: {}\n".format(radio.firmwareVersions)
+    report+= "Firmware: {}\n".format(radio.firmwareVersion)
     report+= "Hardware: {}\n".format(radio.hardware)
-    report+= "RX1: {}\tRX2: {}\n".format(radio.rx1Band, radio.rx2Band)
-    report+= "TX: {} at {}w\n".format(radio.txBand, radio.txPower)
-    report+= "Hardware Version: {}\n".format(radio.hardwareVersion)
     report += "\n"
 
     try:

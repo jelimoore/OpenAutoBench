@@ -11,5 +11,5 @@ class testTxModBalance(testTxModBalance_RSS):
     
     def setup(self):
         super().setup()
-        self._useGet = False
-        self._range = 4
+        self._useGet = True
+        self._range = 8

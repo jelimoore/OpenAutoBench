@@ -23,6 +23,10 @@ radios:
         enable: true
         port: /dev/ttyUSB0
         baud: 9600
+    mtr2k:
+        enable: true
+        port: /dev/ttyUSB0
+        baud: 9600
     dvmproject:
         enable: true
         port: /dev/ttyUSB0
