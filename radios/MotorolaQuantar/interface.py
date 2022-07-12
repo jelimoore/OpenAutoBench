@@ -31,9 +31,7 @@ class MotorolaQuantar(MotorolaRSSRepeater):
     def connect(self):
         try:
             super().connect()
-            print("Getting version")
             self.getVersion()
-            print("Getting info")
             self.stationName = self.get('STN NAME')
             self.serialNumber = self.get('STN SN')
             self.codeplugVersion = self.get('CP VER')
@@ -41,7 +39,6 @@ class MotorolaQuantar(MotorolaRSSRepeater):
             self.rx2Band = self.get('RX2 FREQ_BAND')
             self.txBand = self.get('TX FREQ_BAND')
             self.hardwareVersion = self.get('HW_VER')
-            print("Getting hardware")
             self.getHardware()
 
             self._logger.debug("Station Name: {}".format(self.stationName))
