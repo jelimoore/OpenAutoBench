@@ -10,7 +10,7 @@ from builtins import NotImplementedError
 from radios.MotorolaCommon.Tests.RXFrontEndFilter import protoRxFrontEndFilter
 import time
 
-class testRxFrontEndFilter(protoRXFrontEndFilter):
+class testRxFrontEndFilter(protoRxFrontEndFilter):
     name = "RX - Front End Filter"
     def __init__(self, radio, instrument):
         self._radio = radio

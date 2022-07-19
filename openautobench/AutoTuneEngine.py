@@ -1,5 +1,20 @@
 
 class AutoTuneEngine():
+    def __init__(self, measureCallback, setSoftpotCallback, beginningSoftpot, beginningMeasurement, tolerance=0.05):
+        self._measureFunc = measureCallback
+        self._setSpFunc = setSoftpotCallback
+        self._bsp = beginningSoftpot
+        self._bmeas = beginningMeasurement
+        self._tolerance = 0.05
+
+    def tune():
+        # get initial measurement to find stepping
+        stepping = 0
+        self._setSpFunc(beginningSoftpot - 10)
+        stepping = (self._measureFunc() - self._bmeas) / 10
+        print("Found stepping {}".format(stepping))
+
+    '''
     def __init__(self, beginSetting, beginMeas, setMeas):
         self.currentSetting = beginSetting - 5  # current setting/softpot value is 3 steps lower
         self._beginSetting = beginSetting   # beginning setting/softpot value
@@ -26,5 +41,5 @@ class AutoTuneEngine():
         #print(self.currentSetting)
 
         self._currentMeasurement = currMeas
-
+    '''
   

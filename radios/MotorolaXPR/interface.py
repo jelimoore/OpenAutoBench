@@ -2,7 +2,6 @@ from builtins import ConnectionError
 import numpy as np
 import warnings
 import socket
-import threading
 import logging
 import time
 from radios.MotorolaCommon import MotorolaIP

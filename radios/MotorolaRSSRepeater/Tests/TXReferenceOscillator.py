@@ -13,8 +13,10 @@ class testTxReferenceOscillator_RSS(AutoTest):
         self._frequency = None
         self._logger = logging.getLogger(__name__)
         self.report = ''
+        self.testResult = None
         self._autotuner = None
-        self._tolerance = 25
+        self._tolerance = 50
+        self._curr_sp = 0
 
     def isRadioEligible(self):
         return True
@@ -29,8 +31,6 @@ class testTxReferenceOscillator_RSS(AutoTest):
     def performTest(self):
         self._radio.keyRadio()
         self._instrument.setRXFrequency(self._frequency)
-        #self._radio.setPowerLevel(3)
-        #self._radio.updateSoftpotValue(0x00, self.new_softpot, self._softpotNumBytes)
         time.sleep(7)
         err = round(self._instrument.measureRFError(self._frequency), 2)
         #print("Dekeying")
@@ -39,10 +39,37 @@ class testTxReferenceOscillator_RSS(AutoTest):
         self._logger.info(logLine)
         self.report = logLine
         self.report += '\n\n'
+        self.testResult = err
         return err
 
+    def isCompliant(self):
+        if (self._tolerance * -1 < self.testResult < self._tolerance):
+            return True
+        return False
+
     def performAlignment(self):
-        pass
+        self._logger.debug("Beginning alignment")
+        bsp = self._radio.get('AL PEND RD', prependGet=False)
+        self._curr_sp = bsp
+        self._logger.debug("Beginning softpot value: {}".format(bsp))
+
+        #engine = AutoTuneEngine(self.performTest, self.setSoftpotCallback, bsp)
+        #engine.tune()
+        #self._radio.send('AL PEND SAVE')
+
+        esp = self._radio.get('AL PEND RD', prependGet=False)
+        self._logger.debug("Ending softpot value: {}".format(esp))
+
+    def setSoftpotCallback(self, spval):
+        dir = ""
+        val = abs(spval - self._curr_sp)
+        if (spval > self._curr_sp):
+            dir = 'UP'
+        else:
+            dir = 'DOWN'
+
+        self._radio.send('AL PEND {} {}'.format(dir, val))
+        self._curr_sp = spval
 
     def tearDown(self):
         pass

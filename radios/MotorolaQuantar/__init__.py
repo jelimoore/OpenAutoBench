@@ -14,7 +14,7 @@ AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
 
 logger = logging.getLogger(__name__)
 
-def performTests(testList, instrument, config):
+def performTests(testList, instrument, config, align=False):
     serialPort = config['port']
     baud = config['baud']
     logger.info("Connecting to radio at {}".format(serialPort))
@@ -52,7 +52,9 @@ def performTests(testList, instrument, config):
                     report += '--- {} ---\n'.format(currTest.name)
                     currTest.setup()
                     currTest.performTest()
-                    #currTest.performAlignment()
+                    if (align):
+                        #if (not currTest.isCompliant()):
+                        currTest.performAlignment()
                     currTest.tearDown()
                     report += currTest.report
                 except Exception as e:

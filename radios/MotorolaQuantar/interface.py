@@ -31,9 +31,7 @@ class MotorolaQuantar(MotorolaRSSRepeater):
     def connect(self):
         try:
             super().connect()
-            print("Getting version")
             self.getVersion()
-            print("Getting info")
             self.stationName = self.get('STN NAME')
             self.serialNumber = self.get('STN SN')
             self.codeplugVersion = self.get('CP VER')
@@ -41,7 +39,6 @@ class MotorolaQuantar(MotorolaRSSRepeater):
             self.rx2Band = self.get('RX2 FREQ_BAND')
             self.txBand = self.get('TX FREQ_BAND')
             self.hardwareVersion = self.get('HW_VER')
-            print("Getting hardware")
             self.getHardware()
 
             self._logger.debug("Station Name: {}".format(self.stationName))
@@ -75,3 +72,11 @@ class MotorolaQuantar(MotorolaRSSRepeater):
         self.hardware += 'Wireline: {}, '.format(self.get('WL PORT_STAT'))
         self.hardware += 'Power: {}, '.format(self.get('PS RATED_PWR'))
         self.hardware += 'Battery: {} '.format(self.get('PS BATT_TYPE'))
+
+    def readRSSI(self):
+        # i have no clue what these parameters do, just that they get you RSSI back
+        result = self.send('GET DSP RSSI 1 1 SHORT')
+        result = result.split(' = ', 1)
+        result = result[1].split()
+        print(result[1])
+        return float(result[1])

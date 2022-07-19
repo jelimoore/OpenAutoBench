@@ -27,14 +27,24 @@ class testTxPower_RSS(AutoTest):
         self._instrument.setRXFrequency(self._frequency)
         self._radio.keyRadio()
         time.sleep(5)
-        pow = round(self._instrument.measureRFPower(), 2)
-        self._logger.info("Power: {}w".format(pow))
-        self.report += 'Measured power at {}MHz: {}w\n'.format(self._frequency, pow)
+        power = round(self._instrument.measureRFPower(), 2)
+        self._logger.info("Power: {}w".format(power))
+        self.report += 'Measured power at {}MHz: {}w\n'.format(self._frequency / 1000000, power)
         self._radio.unkeyRadio()
         self.report += '\n'
+        self.testResult = power
+        return power
+
+    def isCompliant(self):
+        return False
             
     def performAlignment(self):
-        raise NotImplementedError
+        self._logger.debug("Beginning alignment")
+        radioPower = round(float(self._radio.txPower) * 100)
+        measuredPower = round(self.testResult * 100)
+        self._radio.send('AL STNPWR WR {} {}'.format(radioPower, measuredPower))
+        time.sleep(1)
+        self._radio.send('AL STNPWR SAVE')
 
     def tearDown(self):
         pass
