@@ -91,6 +91,7 @@ class MotorolaRSSRepeater():
         else:
             command = val
         result = self.send(command)
+        #print(result)
         result = result.split(' = ', 1)
         return result[1]
 

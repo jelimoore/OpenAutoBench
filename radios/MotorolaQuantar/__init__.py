@@ -51,12 +51,14 @@ def performTests(testList, instrument, config, align=False):
                 try:
                     report += '--- {} ---\n'.format(currTest.name)
                     currTest.setup()
-                    currTest.performTest()
                     if (align):
                         #if (not currTest.isCompliant()):
                         currTest.performAlignment()
+                    else:
+                        currTest.performTest()
                     currTest.tearDown()
                     report += currTest.report
+                    report += '\n'
                 except Exception as e:
                     logger.error('Test {} failed.'.format(currTest.name))
                     logger.debug(e)

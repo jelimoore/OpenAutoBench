@@ -76,7 +76,8 @@ class MotorolaQuantar(MotorolaRSSRepeater):
     def readRSSI(self):
         # i have no clue what these parameters do, just that they get you RSSI back
         result = self.send('GET DSP RSSI 1 1 SHORT')
+        #print(result)
         result = result.split(' = ', 1)
         result = result[1].split()
-        print(result[1])
+        #print(result[1])
         return float(result[1])

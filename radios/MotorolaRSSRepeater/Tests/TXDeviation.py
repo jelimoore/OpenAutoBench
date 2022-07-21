@@ -44,11 +44,11 @@ class testTxModBalance_RSS():
             dev = round(self._instrument.measureFMDeviation(), 2)
             self._logger.info("Deviation: {}hz".format(dev))
             self._radio.unkeyRadio()
-            self.report += 'Deviation at {}MHz: {}hz\n'.format(freq, dev)
+            self.report += 'Deviation at {}MHz: {}hz\n'.format(freq / 1000000, dev)
             returnArr.append(dev)
             time.sleep(2)            
 
-        self.report += '\n'
+        #self.report += '\n'
         self.testResult = returnArr
         return returnArr
 
@@ -59,16 +59,23 @@ class testTxModBalance_RSS():
         self._logger.debug("Beginning alignment")
         bsp = self._radio.get('AL TXDEV RD', prependGet=False)
         self._logger.debug("Beginning softpot value: {}".format(bsp))
+        self.report += "Beginning deviations: {}\n".format(bsp)
+
+        deviations = self.performTest()
 
         txDevStr = ""
-        for dev in self.testResult:
+        for dev in deviations:
             txDevStr += "{} ".format(round(dev))
-        
+
+        #print("Writing {}".format(txDevStr))        
         self._radio.send('AL TXDEV WR {}'.format(txDevStr))
+        time.sleep(1)
+        self._radio.send('AL TXDEV SAVE')
         time.sleep(1)
 
         esp = self._radio.get('AL TXDEV RD', prependGet=False)
         self._logger.debug("Ending softpot value: {}".format(esp))
+        self.report += "Ending deviations: {}\n".format(esp)
 
     def tearDown(self):
         pass

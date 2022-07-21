@@ -37,8 +37,8 @@ class testTxReferenceOscillator_RSS(AutoTest):
         self._radio.unkeyRadio()
         logLine = "Measured Frequency Error at {}MHz: {}hz".format(self._frequency/1000000, err)
         self._logger.info(logLine)
-        self.report = logLine
-        self.report += '\n\n'
+        self.report += logLine
+        self.report += '\n'
         self.testResult = err
         return err
 
@@ -48,28 +48,42 @@ class testTxReferenceOscillator_RSS(AutoTest):
         return False
 
     def performAlignment(self):
+        bmeas = self.performTest()
         self._logger.debug("Beginning alignment")
         bsp = self._radio.get('AL PEND RD', prependGet=False)
-        self._curr_sp = bsp
         self._logger.debug("Beginning softpot value: {}".format(bsp))
+        self.report += 'Beginning softpot value: {}\n'.format(bsp)
 
-        #engine = AutoTuneEngine(self.performTest, self.setSoftpotCallback, bsp)
-        #engine.tune()
-        #self._radio.send('AL PEND SAVE')
+
+        engine = AutoTuneEngine(self.performTest, self.setSoftpotCallback, bsp, bmeas, 0)
+        engine.tune()
+        #give it a moment to commit the softpot
+        time.sleep(1)
+        self._radio.send('AL PEND SAVE')
+        time.sleep(1)
 
         esp = self._radio.get('AL PEND RD', prependGet=False)
         self._logger.debug("Ending softpot value: {}".format(esp))
+        self.report += "Ending softpot value: {}\n".format(esp)
 
     def setSoftpotCallback(self, spval):
+        self.report += 'Trying new softpot value {}\n'.format(spval)
+        #quantar is relative, so we have to read the softpot, then adjust it so many steps
+        csp = float(self._radio.get('AL PEND RD', prependGet=False))
+        #print("Starting softpot {}".format(csp))
+        delta = round(abs(csp - spval))
         dir = ""
-        val = abs(spval - self._curr_sp)
-        if (spval > self._curr_sp):
+        # the quantar number thing is reversed
+        # during testing if i had a softpot at 90, then moved it down 5 steps, it would then be at 95
+        if (spval < csp):
             dir = 'UP'
         else:
-            dir = 'DOWN'
+            dir = 'DN'
 
-        self._radio.send('AL PEND {} {}'.format(dir, val))
-        self._curr_sp = spval
+        #print("Moving pendulum {} {} steps".format(dir, delta))
+        self._radio.send('AL PEND {} {}'.format(dir, delta))
+        time.sleep(1)
+        #print("New sp: {}".format(float(self._radio.get('AL PEND RD', prependGet=False))))
 
     def tearDown(self):
         pass
