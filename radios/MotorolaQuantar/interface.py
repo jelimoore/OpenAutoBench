@@ -72,3 +72,12 @@ class MotorolaQuantar(MotorolaRSSRepeater):
         self.hardware += 'Wireline: {}, '.format(self.get('WL PORT_STAT'))
         self.hardware += 'Power: {}, '.format(self.get('PS RATED_PWR'))
         self.hardware += 'Battery: {} '.format(self.get('PS BATT_TYPE'))
+
+    def readRSSI(self):
+        # i have no clue what these parameters do, just that they get you RSSI back
+        result = self.send('GET DSP RSSI 1 1 SHORT')
+        #print(result)
+        result = result.split(' = ', 1)
+        result = result[1].split()
+        #print(result[1])
+        return float(result[1])

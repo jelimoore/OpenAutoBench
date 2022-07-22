@@ -14,6 +14,7 @@ class testTxModBalance_RSS():
         self.report = ''
         self._useGet = False
         self._range = 0
+        self.testResult = None
 
     def isRadioEligible(self):
         return True
@@ -25,6 +26,7 @@ class testTxModBalance_RSS():
 
     def performTest(self):
         self._logger.info("Beginning Mod Balance test")
+        returnArr = []
 
         for i in range(1,self._range + 1):    # end is exclusive; we have 4 steps
             if (self._useGet):
@@ -35,16 +37,45 @@ class testTxModBalance_RSS():
             freq = int(freq.split(' = ')[1])
             if (freq == 0):
                 continue
-            self._logger.info("Testing Frequency {}".format(freq))
+            self._logger.info("Testing Frequency {}".format(freq / 1000000))
             self._instrument.setRXFrequency(freq)
             self._radio.keyRadio()
             time.sleep(5)
             dev = round(self._instrument.measureFMDeviation(), 2)
             self._logger.info("Deviation: {}hz".format(dev))
             self._radio.unkeyRadio()
-            self.report += 'Deviation at {}MHz: {}hz\n'.format(freq, dev)
+            self.report += 'Deviation at {}MHz: {}hz\n'.format(freq / 1000000, dev)
+            returnArr.append(dev)
             time.sleep(2)            
 
-        self.report += '\n'
+        #self.report += '\n'
+        self.testResult = returnArr
+        return returnArr
+
+    def isCompliant(self):
+        return False
+
+    def performAlignment(self):
+        self._logger.debug("Beginning alignment")
+        bsp = self._radio.get('AL TXDEV RD', prependGet=False)
+        self._logger.debug("Beginning softpot value: {}".format(bsp))
+        self.report += "Beginning deviations: {}\n".format(bsp)
+
+        deviations = self.performTest()
+
+        txDevStr = ""
+        for dev in deviations:
+            txDevStr += "{} ".format(round(dev))
+
+        #print("Writing {}".format(txDevStr))        
+        self._radio.send('AL TXDEV WR {}'.format(txDevStr))
+        time.sleep(1)
+        self._radio.send('AL TXDEV SAVE')
+        time.sleep(1)
+
+        esp = self._radio.get('AL TXDEV RD', prependGet=False)
+        self._logger.debug("Ending softpot value: {}".format(esp))
+        self.report += "Ending deviations: {}\n".format(esp)
+
     def tearDown(self):
         pass

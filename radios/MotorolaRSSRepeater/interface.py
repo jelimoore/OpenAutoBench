@@ -84,8 +84,14 @@ class MotorolaRSSRepeater():
                 self.send('DO' + shell)
 
 
-    def get(self, val):
-        result = self.send("GET " + val)
+    def get(self, val, prependGet=True):
+        command = ""
+        if (prependGet):
+            command = "GET " + val
+        else:
+            command = val
+        result = self.send(command)
+        #print(result)
         result = result.split(' = ', 1)
         return result[1]
 
@@ -116,11 +122,3 @@ class MotorolaRSSRepeater():
 
     def getRXFrequency(self):
         return int(self.get('RX FREQ'))
-        
-    def readRSSI(self):
-        # i have no clue what these parameters do, just that they get you RSSI back
-        result = self.send('GET DSP RSSI 1 1 SHORT')
-        result = result.split(' = ', 1)
-        result = result[1].split()
-        print(result[1])
-        return float(result[1])

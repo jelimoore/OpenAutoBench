@@ -82,7 +82,7 @@ def setupInstrument():
         logger.debug(e)
         exit(1)
 
-def testXPR():
+def testXPR(align=False):
     xprConfig = CONFIG['radios']['trbo']
     ipAddr = xprConfig['ipAddress']
     try:
@@ -101,10 +101,10 @@ def testXPR():
     #selectedTests = [TXDeviation.testTxModBalance]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = XPR.AVAILABLE_TESTS
     instrument = setupInstrument()
-    XPR.performTests(selectedTests, instrument, keys, delta, index, ipAddr)
+    XPR.performTests(selectedTests, instrument, keys, delta, index, ipAddr, align=align)
     
 
-def testAPX():
+def testAPX(align=False):
     apxConfig = CONFIG['radios']['apx']
     ipAddr = apxConfig['ipAddress']
     try:
@@ -118,9 +118,9 @@ def testAPX():
     #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = APX.AVAILABLE_TESTS
     instrument = setupInstrument()
-    APX.performTests(selectedTests, instrument, ipAddr)
+    APX.performTests(selectedTests, instrument, ipAddr, align=align)
 
-def testAstro25():
+def testAstro25(align=False):
     astro25Config = CONFIG['radios']['astro25']
     try:
         import radios.MotorolaAstro25 as A25
@@ -132,9 +132,9 @@ def testAstro25():
     #selectedTests = [TXPortablePower.testTxPortablePower]  # TXMeasuredPower.testTxMeasuredPower, TXReferenceOscillator.testTxReferenceOscillator
     selectedTests = A25.AVAILABLE_TESTS
     instrument = setupInstrument()
-    A25.performTests(selectedTests, instrument, astro25Config)
+    A25.performTests(selectedTests, instrument, astro25Config, align=align)
 
-def testDVMProject():
+def testDVMProject(align=False):
     DVMConfig = CONFIG['radios']['dvmproject']
     serialPort = DVMConfig['port']
     try:
@@ -146,9 +146,9 @@ def testDVMProject():
     logger.info("Available tests: {}".format([DVM.AVAILABLE_TESTS]))
     selectedTests = DVM.AVAILABLE_TESTS
     instrument = setupInstrument()
-    DVM.performTests(selectedTests, instrument, serialPort)
+    DVM.performTests(selectedTests, instrument, serialPort, align=align)
 
-def testQuantar():
+def testQuantar(align=False):
     QuantarConfig = CONFIG['radios']['quantar']
     try:
         import radios.MotorolaQuantar as Quantar
@@ -159,9 +159,9 @@ def testQuantar():
     logger.info("Available tests: {}".format([Quantar.AVAILABLE_TESTS]))
     selectedTests = Quantar.AVAILABLE_TESTS
     instrument = setupInstrument()
-    Quantar.performTests(selectedTests, instrument, QuantarConfig)
+    Quantar.performTests(selectedTests, instrument, QuantarConfig, align=align)
 
-def testMTR2k():
+def testMTR2k(align=False):
     MTR2kConfig = CONFIG['radios']['mtr2k']
     try:
         import radios.MotorolaMTR2k as MTR2k
@@ -172,23 +172,23 @@ def testMTR2k():
     logger.info("Available tests: {}".format([MTR2k.AVAILABLE_TESTS]))
     selectedTests = MTR2k.AVAILABLE_TESTS
     instrument = setupInstrument()
-    MTR2k.performTests(selectedTests, instrument, MTR2kConfig)
+    MTR2k.performTests(selectedTests, instrument, MTR2kConfig, align=align)
 
-def testRadio():
+def testRadio(align=False):
     menu = {1: "Motorola XPR", 2: "Motorola APX", 3: "Motorola Astro25", 4: "DVMProject", 5: "Motorola Quantar", 6: 'MTR2000', 9: "Exit"}
     selection = genMenu('Testing', menu)
     if (selection == 1):
-        testXPR()
+        testXPR(align)
     elif (selection == 2):
-        testAPX()
+        testAPX(align)
     elif (selection == 3):
-        testAstro25()
+        testAstro25(align)
     elif (selection == 4):
-        testDVMProject()
+        testDVMProject(align)
     elif (selection == 5):
-        testQuantar()
+        testQuantar(align)
     elif (selection == 6):
-        testMTR2k()
+        testMTR2k(align)
     elif (selection == 9):
         return
 
@@ -197,13 +197,16 @@ logger.info("OpenAutoBench version {} starting up".format(VERSION))
 while True:
     menu = {}
     menu[1] = 'Test Radio'
-    menu[2] = 'About'
+    menu[2] = 'Align Radio'
+    menu[3] = 'About'
     menu[9] = 'Exit'
 
     selection = genMenu('Welcome', menu)
     if (selection == 1):
         testRadio()
     elif (selection == 2):
+        testRadio(align=True)
+    elif (selection == 3):
         print("OpenAutoBench version {}".format(VERSION))
     elif (selection == 9):
         print("Bye")

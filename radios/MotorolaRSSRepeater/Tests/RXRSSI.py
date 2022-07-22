@@ -18,11 +18,14 @@ class testRxRSSI_RSS(AutoTest):
 
     def setup(self):
         self._instrument._sendCmd("DISP RFG")
+        self._instrument.setRFOutputPort('DUPL')
         self._outputLevel = -90
+        # dummy command? might not be needed?
+        #print(self._radio.send('GET PA ON'))
+        print(self._radio.send('SET FREQ TX 0'))
         self._frequency = self._radio.getRXFrequency()
 
     def performTest(self):
-        self._instrument.setRFOutputPort('DUPL')
         self._instrument.enableRFGenerator()
         self._instrument.generateRFSignal(self._frequency, self._outputLevel)
         time.sleep(3)
@@ -33,11 +36,30 @@ class testRxRSSI_RSS(AutoTest):
             self._logger.debug("RSSI reading #{}: {}".format(i, thisRssi))
             time.sleep(1)
 
-        logLine = "Reported RSSI at {}:\t{}dbm".format(self._frequency, round(rssi / 3, 2))
+        avgRssi = round(rssi / 3, 2)
+        logLine = "Reported RSSI at {}MHz:\t{}dbm".format(self._frequency / 1000000, avgRssi)
         self._logger.info(logLine)
         self.report += logLine + '\n'
         # shut off freqgen
         self._instrument.disableRFGenerator()
+        return avgRssi
+
+    def isCompliant(self):
+        return False
+
+    def performAlignment(self):
+        self._logger.debug("Beginning alignment")
+        meas = self.performTest()
+        self.report += 'Beginning RSSI: {}\n'.format(meas)
+        self._instrument.enableRFGenerator()
+        self._instrument.generateRFSignal(self._frequency, self._outputLevel)
+        time.sleep(3)
+        result = self._radio.send('AL RSSI {}'.format(abs(self._outputLevel)))
+        #print(result)
+        time.sleep(1)
+        self._instrument.disableRFGenerator()
+        meas = self.performTest()
+        self.report += 'Ending RSSI: {}\n'.format(meas)
 
     def tearDown(self):
         pass
