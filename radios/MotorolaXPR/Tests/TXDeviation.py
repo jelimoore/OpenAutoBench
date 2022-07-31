@@ -17,10 +17,10 @@ class testTxModBalance():
         if (self._radio.formFactor == 'M'):
             if (self._radio.bandsplit == "Q" or self._radio.bandsplit == 'T'):
                 return True
-            else:
-                return False
-        else:
-            return False
+        if (self._radio.formFactor == 'H'):
+            if (self._radio.bandsplit == "Q" or self._radio.bandsplit == "T" or self._radio.bandsplit == "R"):
+                return True
+        return False
     def setup(self):
         self._instrument.setDisplay("AFAN")
         self._instrument._sendCmd("AFAN:FILT1 '<20Hz HPF'")

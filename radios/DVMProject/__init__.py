@@ -21,7 +21,7 @@ def getFrequency(prompt):
         except:
             print("Invalid frequency entered. Please try again.")
 
-def performTests(testList, instrument, serialPort):
+def performTests(testList, instrument, serialPort, align=False):
     logger.info("Connecting to radio at {}".format(serialPort))
     radio = DVMProjectInterface(serialPort)
 

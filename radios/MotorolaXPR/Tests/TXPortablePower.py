@@ -14,15 +14,17 @@ class testTxPortablePower(AutoTest):
         self._lpTestpoints = []
         self._hpTestpoints = []
         self.report = ''
+        self._highPowerLevel = 0
+        self._lowPowerLevel = 0
 
     def isRadioEligible(self):
         if (self._radio.formFactor == 'H'):
             if (self._radio.bandsplit == "T" and self._radio.powerLevel == "D"):
                 return True
-            else:
-                return False
-        else:
-            return False
+            if (self._radio.bandsplit == "R" and self._radio.powerLevel == "D"):
+                return True
+        
+        return False
 
     def setup(self):
         self._instrument.setDisplay("RFAN")
@@ -36,7 +38,7 @@ class testTxPortablePower(AutoTest):
                                 504.775,
                                 511.825]
         
-        if (self._radio.bandsplit == "R"):
+        if (self._radio.bandsplit == "R" and self._radio.formFactor == 'H'):
             self._frequencies =[403.025,
                                 415.425,
                                 427.825,

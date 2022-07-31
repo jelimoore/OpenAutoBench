@@ -69,16 +69,23 @@ def setupInstrument():
 
         if (instrument is None):
             raise Exception("Unsupported instrument protocol/interface combination: {}, {}".format(instProtocol, instInterface))
-        instrument.connect()
-        time.sleep(0.2)
-        info = instrument.getInfo()
-        if (info is None or info == ''):
-            raise Exception("Instrument did not respond")
+        try:
+            instrument.connect()
+            time.sleep(0.2)
+            info = instrument.getInfo()
+            if (info is None or info == ''):
+                raise Exception("Instrument did not respond")
+        except Exception as e:
+            instrument.connect()
+            time.sleep(0.2)
+            info = instrument.getInfo()
+            if (info is None or info == ''):
+                raise Exception("Instrument did not respond")
         logger.info("Connected to test set - {}".format(info))
         #time.sleep(0.5)
         return instrument
     except Exception as e:
-        logger.critical("Failure connecting to instrument. Exiting.")
+        logger.critical("Failure setting up instrument. Exiting.")
         logger.debug(e)
         exit(1)
 

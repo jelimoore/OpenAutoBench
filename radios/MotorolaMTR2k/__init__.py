@@ -12,7 +12,7 @@ AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
 
 logger = logging.getLogger(__name__)
 
-def performTests(testList, instrument, config):
+def performTests(testList, instrument, config, align=False):
     serialPort = config['port']
     baud = config['baud']
     logger.info("Connecting to radio at {}".format(serialPort))

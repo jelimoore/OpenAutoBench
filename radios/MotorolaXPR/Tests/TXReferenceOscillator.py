@@ -21,7 +21,8 @@ class testTxReferenceOscillator(AutoTest):
 
     def isRadioEligible(self):
         if (self._radio.bandsplit == "Q" or
-            self._radio.bandsplit == "T"):
+            self._radio.bandsplit == "T" or
+            self._radio.bandsplit == 'R'):
             return True
         else:
             return False
@@ -37,7 +38,7 @@ class testTxReferenceOscillator(AutoTest):
             self._frequency = 511.825
         if (self._radio.bandsplit == "T" and self._radio.formFactor == 'M'):
             self._frequency = 527.0
-        if (self._radio.bandsplit == "R"):
+        if (self._radio.bandsplit == "R" and self._radio.formFactor == 'H'):
             self._frequency = 477.425
 
         self.old_softpot = self._radio.getSoftpotValue(0x00, numBytes=self._softpotNumBytes)[0]

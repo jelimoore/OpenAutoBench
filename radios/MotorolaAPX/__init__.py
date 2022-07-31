@@ -11,7 +11,7 @@ AVAILABLE_TESTS =  [TXReferenceOscillator.testTxReferenceOscillator,
 
 logger = logging.getLogger(__name__)
 
-def performTests(testList, instrument, ipAddr):
+def performTests(testList, instrument, ipAddr, align=False):
     logger.info("Connecting to radio at {}".format(ipAddr))
     radio = MotorolaAPX(ipAddr)
 

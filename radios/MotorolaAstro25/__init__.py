@@ -65,7 +65,7 @@ def dialRadio(config):
 def undialRadio(process):
     os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
-def performTests(testList, instrument, config):
+def performTests(testList, instrument, config, align=False):
     serialPort = config['port']
     baud = config['baud']
     ipAddr = '192.168.128.1'
