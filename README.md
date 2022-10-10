@@ -1,5 +1,7 @@
 # OpenAutoBench
 
+## THIS SOFTWARE IS DEPRECATED. DO NOT USE THIS. SEE NEW VERSION AT https://github.com/jelimoore/OpenAutoBench-ng
+
 An open source project for automatically testing and tuning land mobile radios and infrastructure.
 
 ## Notes, warnings, etc
